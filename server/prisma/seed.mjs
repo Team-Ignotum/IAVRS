@@ -1,11 +1,17 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import pg from "pg";
 
 import { config } from "dotenv";
 
 // Load .env so NIC_SSH_PUB_KEY_B64 is available during seeding
 config({ path: new URL("../.env", import.meta.url).pathname });
 
-const prisma = new PrismaClient();
+// Connection adapater
+const { Pool } = pg;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const User = await prisma.user.upsert({
