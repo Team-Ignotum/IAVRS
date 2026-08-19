@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
   postgres:
     container_name: iarvs_pgdb
     image: postgres:16
@@ -27,7 +26,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-
   pgadmin:
     container_name: iarvs_pgadmin
     image: dpage/pgadmin4:8.12
@@ -50,17 +48,30 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  redis:
+    container_name: iarvs_redis
+    image: redis:latest
+    restart: always
+
+    ports:
+      - "6379:6379"
+
+    networks:
+      - mynetwork
+
+    volumes:
+      - redis_data:/data
 
 volumes:
-
   postgres_data:
     driver: local
 
   pgadmin_data:
     driver: local
 
+  redis_data:
+    driver: local
 
 networks:
-
   mynetwork:
     driver: bridge

@@ -1,7 +1,9 @@
 # Enforcing Branch Naming Convention
 
 name: Branch Naming Convention
+
 run-name: "Evaluate new branch [${{ github.ref_name }}]"
+
 on:
   create:
     branches:
@@ -13,35 +15,84 @@ permissions:
 jobs:
   check-branch-name:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check branch name
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          BRANCH="${{ github.ref_name }}"
+          BRANCH: ${{ github.ref_name }}
 
+        run: |
           # Branches exempt from naming rules
           EXEMPT="^(main|dev|dev-stage|staging|develop)$"
+
           if echo "$BRANCH" | grep -Eq "$EXEMPT"; then
             echo "✅ Exempt branch '$BRANCH' — skipping check"
             exit 0
           fi
 
-          # Your naming convention regex
-          PATTERN="^(fe|be|infra|config)\/(feat|fix|hotfix|docs|refactor|chore|release)\/[a-z0-9][a-z0-9\-]+$"
+          # Branch naming convention:
+          # <area>/<type>/<descriptor>
+          #
+          # Areas:
+          #   fe | be | infra | config
+          #
+          # Types:
+          #   feat | fix | hotfix | docs | refactor | chore | release
+          PATTERN="^(fe|be|infra|config)/(feat|fix|hotfix|docs|refactor|chore|release)/[a-z0-9][a-z0-9-]+$"
 
           if echo "$BRANCH" | grep -Eq "$PATTERN"; then
             echo "✅ Branch name '$BRANCH' is valid"
+            exit 0
+          fi
+
+          echo "❌ Branch name '$BRANCH' does not match the IARVS naming convention"
+          echo ""
+
+          echo "⚠️ IARVS BRANCH POLICY"
+          echo "This branch violates the required branch naming convention."
+          echo "The branch will now be deleted."
+          echo ""
+
+          echo "Required format:"
+          echo "<area>/<type>/<descriptor>"
+          echo ""
+
+          echo "Allowed areas:"
+          echo "  fe"
+          echo "  be"
+          echo "  infra"
+          echo "  config"
+          echo ""
+
+          echo "Allowed types:"
+          echo "  feat"
+          echo "  fix"
+          echo "  hotfix"
+          echo "  docs"
+          echo "  refactor"
+          echo "  chore"
+          echo "  release"
+          echo ""
+
+          echo "Examples:"
+          echo "  fe/feat/student-registration"
+          echo "  be/feat/prerequisite-validation"
+          echo "  be/fix/registration-api"
+          echo "  infra/chore/docker-update"
+          echo "  config/refactor/auth-config"
+          echo ""
+
+          echo "Deleting invalid branch..."
+
+          ENCODED_BRANCH=$(python3 -c 'import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$BRANCH")
+
+          if gh api -X DELETE \
+            "repos/${{ github.repository }}/git/refs/heads/${ENCODED_BRANCH}"; then
+            echo "🗑️ Branch '$BRANCH' deleted successfully."
           else
-            echo "❌ Branch name '$BRANCH' does not match naming convention"
-            echo ""
-            echo "Expected format: <area>/<type>/<descriptor>"
-            echo "Areas:  fe | be | infra | config"
-            echo "Types:  feat | fix | hotfix | docs | refactor | chore | release"
-            echo "Example: fe/feat/ed-110  or  be/fix/ed-45"
-            echo ""
-            echo "Deleting invalid branch..."
-            ENCODED_BRANCH=$(python3 -c 'import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))' "$BRANCH")
-            gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${ENCODED_BRANCH}"
+            echo "❌ Failed to delete branch '$BRANCH'."
             exit 1
           fi
+
+          exit 1
