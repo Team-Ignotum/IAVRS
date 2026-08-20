@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import crest from "../../src/app/favicon.ico.jpeg";
+import styles from "./AsideBar.module.css";
 import {
   BriefcaseBusiness,
   CircleHelp,
@@ -33,7 +34,6 @@ const mainLinks = [
 ];
 
 const bottomLinks = [
-  
   {
     label: "Support",
     href: "/admin/support",
@@ -62,19 +62,19 @@ export function AdminSidebar() {
   return (
     <aside
       id="admin-sidebar-navigation"
-      className={`admin-sidebar ${collapsed ? "collapsed" : ""}`}
+      className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}
     >
-      <div className="sidebar-brand">
-        <div className="sidebar-logo">
+      <div className={styles.brand}>
+        <div className={styles.logo}>
           <Image src={crest} alt="IARVS crest" width={30} height={30} />
         </div>
 
-        <div className="sidebar-brand-text">
+        <div className={styles.brandText}>
           <strong>IARVS PORTAL</strong>
         </div>
 
         <button
-          className="sidebar-toggle"
+          className={styles.toggle}
           type="button"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!collapsed}
@@ -82,11 +82,15 @@ export function AdminSidebar() {
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           onClick={() => setCollapsed((current) => !current)}
         >
-          {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          {collapsed ? (
+            <PanelLeftOpen size={16} />
+          ) : (
+            <PanelLeftClose size={16} />
+          )}
         </button>
       </div>
 
-      <nav className="sidebar-main-nav" aria-label="Admin navigation">
+      <nav className={styles.mainNav} aria-label="Admin navigation">
         {mainLinks.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -95,22 +99,18 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`admin-nav-link ${active ? "active" : ""}`}
+              className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
               aria-current={active ? "page" : undefined}
             >
-              <Icon
-                className="admin-nav-icon"
-                size={19}
-                strokeWidth={1.8}
-              />
+              <Icon className={styles.navIcon} size={19} strokeWidth={1.8} />
 
-              <span className="admin-nav-label">{item.label}</span>
+              <span className={styles.navLabel}>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <nav className="sidebar-bottom-nav" aria-label="Settings navigation">
+      <nav className={styles.bottomNav} aria-label="Settings navigation">
         {bottomLinks.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -119,16 +119,12 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`admin-nav-link ${active ? "active" : ""}`}
+              className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
               aria-current={active ? "page" : undefined}
             >
-              <Icon
-                className="admin-nav-icon"
-                size={19}
-                strokeWidth={1.8}
-              />
+              <Icon className={styles.navIcon} size={19} strokeWidth={1.8} />
 
-              <span className="admin-nav-label">{item.label}</span>
+              <span className={styles.navLabel}>{item.label}</span>
             </Link>
           );
         })}
