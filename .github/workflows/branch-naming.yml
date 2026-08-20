@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   check-branch-name:
+    name: Branch Naming Convention
     runs-on: ubuntu-latest
 
     steps:
