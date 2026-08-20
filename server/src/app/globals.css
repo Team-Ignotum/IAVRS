@@ -49,6 +49,12 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+@theme {
+  --text-page-title: 1.5rem;
+  --text-page-title--line-height: 2rem;
+  --text-page-title--font-weight: 600;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
